@@ -14,8 +14,8 @@ import static util.Constants.Directions.*;
 public class MainChar extends Character {
 
     private BufferedImage [][] animations;
-    private int aniTick, aniIndex = 0, aniSpeed = 18;
-    private int playerAction = IDLE_DOWN;
+    private int aniTick, aniIndex = 0, aniSpeed = 18, moveLength = 3;
+    private int playerAction = MOVE_DOWN;
     private int saveDir = DOWN;
     private boolean right, left, up, down;
 
@@ -23,10 +23,6 @@ public class MainChar extends Character {
     public MainChar(float x, float y) {
         super(x, y);
         loadAnimations();
-    }
-
-    public int returnAction(){
-        return playerAction;
     }
 
     /*setters for keyboardInputs class
@@ -50,14 +46,12 @@ public class MainChar extends Character {
 
     public void update() {
         updatePosition();
-        updateAnimationTick();
         setAnimation();
+        updateAnimationTick();
     }
 
     public void render(Graphics g) {
         g.drawImage(animations[playerAction][aniIndex], (int) x, (int) y, 256, 256, null);
-        // g.setColor(Color.BLACK);
-        // g.fillRect((int) x, (int) y, 256, 256);
     }
 
 
@@ -76,21 +70,11 @@ public class MainChar extends Character {
                 playerAction = MOVE_UP;
                 saveDir = UP;
             }
-        } else 
-            switch(saveDir){
-                case(LEFT):
-                    playerAction = IDLE_LEFT;
-                    break;
-                case(RIGHT):
-                    playerAction = IDLE_RIGHT;
-                    break;
-                case(DOWN):
-                    playerAction = IDLE_DOWN;
-                    break;
-                case(UP):
-                    playerAction = IDLE_UP;
-                    break;
+            else{
+                resetAniTick();
+                aniIndex = 1;
             }
+        } 
     }
 
     private void resetAniTick() {
@@ -100,18 +84,33 @@ public class MainChar extends Character {
 
     private void updatePosition() {
         if(up && !down)
-            y -= 5;
-        else if(down && !up)
-            y += 5;
-        
-        if(left && !right)
-            x -= 5;
-        else if(right && !left)
-            x += 5;
+            if((right && !left)) {
+                y -= moveLength / Math.sqrt(2);
+                x += moveLength / Math.sqrt(2);
+            } else if(left && !right){
+                y -= moveLength / Math.sqrt(2);
+                x -= moveLength / Math.sqrt(2);
+            } else 
+                y-= moveLength;
+        else if(down && !up) {
+            if((right && !left)){
+                y += moveLength / Math.sqrt(2);
+                x += moveLength / Math.sqrt(2);
+            } else if(left && !right){
+                y += moveLength / Math.sqrt(2);
+                x -= moveLength / Math.sqrt(2);
+            } else 
+                y += moveLength;
+        } else{
+            if(left && !right)
+                x -= moveLength;
+            else if(right && !left)
+                x += moveLength;
+        }
     }
 
     private void loadAnimations() {
-        InputStream is = getClass().getResourceAsStream("/characterFemale.png");
+        InputStream is = getClass().getResourceAsStream("/characterFemale1.png");
 
         try {
             //nalozi slike iz fajla
@@ -122,27 +121,14 @@ public class MainChar extends Character {
 
 
 
-            animations = new BufferedImage [NUM_MOVES][3];
+            animations = new BufferedImage [4][4];
 
-            // //nalozi za moving
-            // for(int moves = 0; moves < 4; moves++) {
-            //     for(int subM = 0; subM < getAnimationAmount(moves); subM++) {
-            //         animations[moves + 4][subM] = img.getSubimage(64 * subM, 64 * moves, 64, 64);
-            //     }
-            // }
-
-            // //nalozi za stationary
-            // for(int moves = 0; moves < 4; moves++) {
-            //     animations[moves][0] = img.getSubimage(64 * 1, 64 * moves, 64, 64);
-            // }
-
-            for(int moves = 0; moves < animations.length; moves++){
-                for(int i = 0; i < animations[0].length; i++){
-                    animations[moves][i] = img.getSubimage(1 * 64, 3 * 64, 64, 64);
+            //nalozi za moving
+            for(int moves = 0; moves < 4; moves++) {
+                for(int subM = 0; subM < 4; subM++) {
+                    animations[moves][subM] = img.getSubimage(64 * subM, 64 * moves, 64, 64);
                 }
             }
-
-
 
         } catch (IOException e) {
             e.printStackTrace();
