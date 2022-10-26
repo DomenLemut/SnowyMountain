@@ -1,14 +1,7 @@
 package util;
 
 public class Constants {
-
-    public static class Directions {
-        public static final int LEFT = 0;
-        public static final int RIGHT = 1;
-        public static final int UP = 2;
-        public static final int DOWN = 3;
-    }
-
+    
     //A class to control character frames
     public static class PlayerConstants {
         //playeractions

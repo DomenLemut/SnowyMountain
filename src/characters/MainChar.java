@@ -2,21 +2,16 @@ package characters;
 
 import java.awt.image.BufferedImage;
 import java.awt.Graphics;
-import java.io.IOException;
-import java.io.InputStream;
-import java.awt.Color;
 
-import javax.imageio.ImageIO;
+import util.IO;
 
 import static util.Constants.PlayerConstants.*;
-import static util.Constants.Directions.*;
 
 public class MainChar extends Character {
 
     private BufferedImage [][] animations;
     private int aniTick, aniIndex = 0, aniSpeed = 18, moveLength = 3;
     private int playerAction = MOVE_DOWN;
-    private int saveDir = DOWN;
     private boolean right, left, up, down;
 
 
@@ -58,32 +53,25 @@ public class MainChar extends Character {
     private void setAnimation() {
         if(left && !right) {
             playerAction = MOVE_LEFT;
-            saveDir = LEFT;
         } else if(right && !left) {
             playerAction = MOVE_RIGHT;
-            saveDir = RIGHT;
         } else if(!left && !right){
             if(!up && down){
                 playerAction = MOVE_DOWN;
-                saveDir = DOWN;
             } else if(!down && up){
                 playerAction = MOVE_UP;
-                saveDir = UP;
-            }
-            else{
-                resetAniTick();
+            } else{
+                aniTick = 0;
                 aniIndex = 1;
             }
-        } 
-    }
-
-    private void resetAniTick() {
-        aniTick = 0;
-        aniIndex = 0;
+        } else{
+            aniTick = 0;
+            aniIndex = 1;
+        }
     }
 
     private void updatePosition() {
-        if(up && !down)
+        if(up && !down) {
             if((right && !left)) {
                 y -= moveLength / Math.sqrt(2);
                 x += moveLength / Math.sqrt(2);
@@ -92,7 +80,7 @@ public class MainChar extends Character {
                 x -= moveLength / Math.sqrt(2);
             } else 
                 y-= moveLength;
-        else if(down && !up) {
+        } else if(down && !up) {
             if((right && !left)){
                 y += moveLength / Math.sqrt(2);
                 x += moveLength / Math.sqrt(2);
@@ -101,7 +89,7 @@ public class MainChar extends Character {
                 x -= moveLength / Math.sqrt(2);
             } else 
                 y += moveLength;
-        } else{
+        } else {
             if(left && !right)
                 x -= moveLength;
             else if(right && !left)
@@ -110,33 +98,13 @@ public class MainChar extends Character {
     }
 
     private void loadAnimations() {
-        InputStream is = getClass().getResourceAsStream("/characterFemale1.png");
+        BufferedImage img = IO.loadImage(IO.MAIN_CHAR_SPRITE);
+        animations = new BufferedImage [4][4];
 
-        try {
-            //nalozi slike iz fajla
-            BufferedImage img = ImageIO.read(is);
-            System.out.println();
-            System.out.println("picture: ");
-            System.out.println(img + "\n");
-
-
-
-            animations = new BufferedImage [4][4];
-
-            //nalozi za moving
-            for(int moves = 0; moves < 4; moves++) {
-                for(int subM = 0; subM < 4; subM++) {
-                    animations[moves][subM] = img.getSubimage(64 * subM, 64 * moves, 64, 64);
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e){
-                e.printStackTrace();
+        //nalozi za moving
+        for(int moves = 0; moves < 4; moves++) {
+            for(int subM = 0; subM < 4; subM++) {
+                animations[moves][subM] = img.getSubimage(64 * subM, 64 * moves, 64, 64);
             }
         }
     }

@@ -4,9 +4,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import main.GamePanel;
-import static util.Constants.Directions.*;
 
-public class KeyboardInputs implements KeyListener{
+public class KeyboardInputs implements KeyListener {
 
     private GamePanel gamePanel;
 

@@ -78,7 +78,7 @@ public class Game implements Runnable{
 
 	        if(System.currentTimeMillis() - lastCheck >= 1000) {
 				//print staticstics
-	            System.out.println("FPS: " + frames + " [" + "ups: " + updates + "] position: " + player.getX() + " " + player.getY() + " animation: " + player.returnAction());
+	            System.out.println("FPS: " + frames + " [" + "ups: " + updates + "] position: " + player.getX() + " " + player.getY());
 	            frames = 0;
 	            lastCheck = System.currentTimeMillis();
 				updates = 0;
