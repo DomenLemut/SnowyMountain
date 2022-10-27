@@ -3,10 +3,12 @@ package main;
 import java.awt.Graphics;
 
 import characters.MainChar;
+import scenery.Scenery;
 
 public class Game implements Runnable{
 	private GameWindow gameWindow;
 	private GamePanel gamePanel;
+	private Scenery scenery;
 	private Thread gameThread;
 	private final int FPS_SET = 120;
 	private final int UPS_SET = 200;
@@ -24,7 +26,8 @@ public class Game implements Runnable{
 	}
 
 	private void initClasses() {
-		player = new MainChar(000, 000);
+		player = new MainChar(1000, 1000);
+		scenery = new Scenery(100, 100, 16, 16);
 	}
 
 	private void startGameLoop() {
@@ -39,7 +42,9 @@ public class Game implements Runnable{
 
 	public void render(Graphics g) {
 		//here we render game elements independent to gamePanel
+		scenery.render(g);
 		player.render(g);
+
 	}
 
 	@Override
