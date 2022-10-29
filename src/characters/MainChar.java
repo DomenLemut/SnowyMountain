@@ -2,21 +2,16 @@ package characters;
 
 import java.awt.image.BufferedImage;
 import java.awt.Graphics;
-import java.io.IOException;
-import java.io.InputStream;
-import java.awt.Color;
 
-import javax.imageio.ImageIO;
+import util.IO;
 
 import static util.Constants.PlayerConstants.*;
-import static util.Constants.Directions.*;
 
 public class MainChar extends Character {
 
     private BufferedImage [][] animations;
-    private int aniTick, aniIndex = 0, aniSpeed = 18;
-    private int playerAction = IDLE_DOWN;
-    private boolean moving = false;
+    private int aniTick, aniIndex = 0, aniSpeed = 18, moveLength = 3;
+    private int playerAction = MOVE_DOWN;
     private boolean right, left, up, down;
 
 
@@ -25,10 +20,8 @@ public class MainChar extends Character {
         loadAnimations();
     }
 
-    public int returnAction(){
-        return playerAction;
-    }
-
+    /*setters for keyboardInputs class
+    --------------------------------------*/
     public void setUP(boolean b) {
         this.up = b;
     }
@@ -44,85 +37,74 @@ public class MainChar extends Character {
     public void setLEFT(boolean b) {
         this.left = b;
     }
+    //--------------------------------------
 
     public void update() {
         updatePosition();
-        updateAnimationTick();
         setAnimation();
+        updateAnimationTick();
     }
 
     public void render(Graphics g) {
-        g.drawImage(animations[1][2], (int) x, (int) y, 256, 256, null);
-        //g.setColor(Color.BLACK);
-        //g.fillRect((int) x, (int) y, 256, 256);
-
+        g.drawImage(animations[playerAction][aniIndex], (int) x, (int) y, 256, 256, null);
     }
 
 
     private void setAnimation() {
-        if(left && !right)
+        if(left && !right) {
+            playerAction = MOVE_LEFT;
+        } else if(right && !left) {
             playerAction = MOVE_RIGHT;
-        else if(right && !left)
-            playerAction = MOVE_RIGHT;
-        else if(!left && !right){
-            if(!up && down)
+        } else if(!left && !right){
+            if(!up && down){
                 playerAction = MOVE_DOWN;
-            if(!down && up)
+            } else if(!down && up){
                 playerAction = MOVE_UP;
+            } else{
+                aniTick = 0;
+                aniIndex = 1;
+            }
+        } else{
+            aniTick = 0;
+            aniIndex = 1;
         }
     }
 
-    private void resetAniTick() {
-        aniTick = 0;
-        aniIndex = 0;
-    }
-
     private void updatePosition() {
-        if(up && !down)
-            y -= 5;
-        else if(down && !up)
-            y += 5;
-        
-        if(left && !right)
-            x -= 5;
-        else if(right && !left)
-            x += 5;
-
+        if(up && !down) {
+            if((right && !left)) {
+                y -= moveLength / Math.sqrt(2);
+                x += moveLength / Math.sqrt(2);
+            } else if(left && !right){
+                y -= moveLength / Math.sqrt(2);
+                x -= moveLength / Math.sqrt(2);
+            } else 
+                y-= moveLength;
+        } else if(down && !up) {
+            if((right && !left)){
+                y += moveLength / Math.sqrt(2);
+                x += moveLength / Math.sqrt(2);
+            } else if(left && !right){
+                y += moveLength / Math.sqrt(2);
+                x -= moveLength / Math.sqrt(2);
+            } else 
+                y += moveLength;
+        } else {
+            if(left && !right)
+                x -= moveLength;
+            else if(right && !left)
+                x += moveLength;
+        }
     }
 
     private void loadAnimations() {
-        InputStream is = getClass().getResourceAsStream("/characterFemale.png");
+        BufferedImage img = IO.loadImage(IO.MAIN_CHAR_SPRITE);
+        animations = new BufferedImage [4][4];
 
-        try {
-            //nalozi slike iz fajla
-            BufferedImage img = ImageIO.read(is);
-            System.out.println();
-            System.out.println("picture: ");
-            System.out.println(img + "\n");
-
-
-
-            animations = new BufferedImage [NUM_MOVES][3];
-
-            for(int moves = 0; moves < 4; moves++) {
-                for(int subM = 0; subM < getAnimationAmount(moves); subM++) {
-                    animations[moves + 4][subM] = img.getSubimage(64 * subM, 64 * moves, 64, 64);
-                }
-            }
-
-            for(int moves = 0; moves < 4; moves++) {
-                animations[moves][0] = animations[moves + 4][1];
-            }
-
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e){
-                e.printStackTrace();
+        //nalozi za moving
+        for(int moves = 0; moves < 4; moves++) {
+            for(int subM = 0; subM < 4; subM++) {
+                animations[moves][subM] = img.getSubimage(64 * subM, 64 * moves, 64, 64);
             }
         }
     }
