@@ -9,22 +9,18 @@ public class Scenery {
     private int tileWidth;
     private int enlargement = 8;
     private BufferedImage map [][];
-    private BufferedImage house;
+    private SceneryObject house;
 
-    public Scenery(int width, int heigth, int tileWidth, int tileHeight){
+    public Scenery(int width, int heigth, int tileWidth, int tileHeight) {
         this.tileHeight = tileHeight;
         this.tileWidth = tileWidth;
         this.map = new BufferedImage [width][heigth];
         fillMap();
-        house = IO.loadImage("House1.png");
+        house = new SceneryObject("House1.png", 100, 100, 1024, 1024);
     }
 
-    public void setObject(){
-
-    }
-
-    public void fillMap(){
-        BufferedImage img = IO.loadImage("Tile.png");
+    public void fillMap() {
+        BufferedImage img = IO.loadImage("dirtTile.png");
         BufferedImage tile =  img.getSubimage(0, 0, 16, 16);
         System.out.println("tile" + tile);
         for(int i = 0; i < map.length; i++){
@@ -34,12 +30,16 @@ public class Scenery {
         }
     }
 
-    public void render(Graphics g) {
+    public void renderMap(Graphics g) {
         for(int i = 0; i < map.length; i++){
             for(int j = 0; j < map[0].length; j++){
                 g.drawImage(map[i][j], i * tileHeight * enlargement, j * tileWidth * enlargement, tileHeight * enlargement, tileWidth * enlargement, null);
             }
         }   
-        g.drawImage(house, 100, 100, 1024, 1024, null);
+    }
+
+    public void render(Graphics g) {
+        renderMap(g);
+        house.render(g);
     }
 }
